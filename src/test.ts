@@ -47,20 +47,18 @@ capture.on("packet", (buf) => {
     }
 });
 
-stream.on("PKTNewNpc", (pkt) => {
-    let stats = Object.fromEntries(pkt.parsed.npcStruct.statPair.map(v => {
-        return [stattype[v.statType], v.value]
-    }))
-    console.log("PKTNewNpc", pkt.parsed, stats)
 
-})
 
 
 
 stream.on("*", (data, opcode, compression, xor) => {
-    return;
+
     let map = mapping.get(opcode);
-    if(!map) return;
+    if(!map) {
+        let buf = compressor.decrypt(data, opcode, compression, xor)
+        console.log("Unknown pkt", opcode, "data:", buf)
+        return
+    }
     const [name, read] = map;
     let pkt = new PKT(Buffer.from(data), opcode, compression, Boolean(xor), compressor, read)
     console.log(name, pkt.parsed)
