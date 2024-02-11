@@ -1,4 +1,4 @@
-import { createReadStream, createWriteStream, readFileSync } from "fs";
+import { createReadStream, createWriteStream, openSync, readFileSync } from "fs";
 import { MeterData } from "./data";
 import { Decompressor } from "./decompressor";
 import { LiveLogger, Logger, ReplayLogger } from "./logger/logger";
@@ -15,6 +15,8 @@ import * as Vector3F from "./packets/common/Vector3F";
 import { Read } from "./packets/stream";
 
 import { inspect } from "util";
+import { write } from "fs";
+import { writeFile } from "fs/promises";
 inspect.defaultOptions.depth = null; //Use to console log full objects for debug
 
 const oodle_state = readFileSync("./meter-data/oodle_state.bin");
@@ -48,19 +50,22 @@ capture.on("packet", (buf) => {
 });
 
 
-
-
+let pkts = []
 
 stream.on("*", (data, opcode, compression, xor) => {
-
     let map = mapping.get(opcode);
     if(!map) {
         let buf = compressor.decrypt(data, opcode, compression, xor)
-        console.log("Unknown pkt", opcode, "data:", buf)
+        console.log("Unknown pkt", opcode, "data:", buf.toString("hex"))
+        pkts.push("Unknown pkt" + opcode + "data:" + buf.toString("hex"))
         return
     }
     const [name, read] = map;
     let pkt = new PKT(Buffer.from(data), opcode, compression, Boolean(xor), compressor, read)
     console.log(name, pkt.parsed)
+    pkts.push("pkt" + name + " " + JSON.stringify(pkt.parsed))
 })
 
+setInterval(async () => {
+    await writeFile("pkt.log", pkts.join("\n"))
+}, 5000).unref()
