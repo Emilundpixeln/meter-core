@@ -1,161 +1,3 @@
-declare const PARSED_LOG_VERSION = 19;
-declare enum StatusEffectTarget {
-    OTHER = 0,
-    PARTY = 1,
-    SELF = 2
-}
-declare enum StatusEffectBuffTypeFlags {
-    NONE = 0,
-    DMG = 1,
-    CRIT = 2,
-    ATKSPEED = 4,
-    MOVESPEED = 8,
-    HP = 16,
-    DEFENSE = 32,
-    RESOURCE = 64,
-    COOLDOWN = 128,
-    STAGGER = 256,
-    SHIELD = 512,
-    ANY = 262144
-}
-interface StatusEffect {
-    target: StatusEffectTarget;
-    category: "buff" | "debuff";
-    buffcategory: string;
-    bufftype: StatusEffectBuffTypeFlags;
-    uniquegroup: number;
-    source: StatusEffectSource;
-}
-interface StatusEffectSource {
-    name: string;
-    desc: string;
-    icon: string;
-    skill?: Skill;
-    setname?: string;
-}
-interface DamageStatistics {
-    totalDamageDealt: number;
-    topDamageDealt: number;
-    totalDamageTaken: number;
-    topDamageTaken: number;
-    totalHealingDone: number;
-    topHealingDone: number;
-    totalShieldDone: number;
-    topShieldDone: number;
-    debuffs: Map<number, StatusEffect>;
-    buffs: Map<number, StatusEffect>;
-    topShieldGotten: number;
-    totalEffectiveShieldingDone: number;
-    topEffectiveShieldingDone: number;
-    topEffectiveShieldingUsed: number;
-    effectiveShieldingBuffs: Map<number, StatusEffect>;
-    appliedShieldingBuffs: Map<number, StatusEffect>;
-}
-interface GameState {
-    startedOn: number;
-    lastCombatPacket: number;
-    fightStartedOn: number;
-    localPlayer: string;
-    currentBoss: EntityState | undefined;
-    entities: Map<string, EntityState>;
-    damageStatistics: DamageStatistics;
-}
-interface GameStateNew {
-    startedOn: number;
-    lastCombatPacket: number;
-    fightStartedOn: number;
-    entities: Map<string, EntityState>;
-    damageStatistics: DamageStatistics;
-}
-interface HealSource {
-    source: string;
-    expires: number;
-}
-interface DamageInfo {
-    damageDealt: number;
-    rdpsDamageReceived: number;
-    rdpsDamageReceivedSupp: number;
-    rdpsDamageGiven: number;
-    damageDealtDebuffedBySupport: number;
-    damageDealtBuffedBySupport: number;
-}
-interface EntityState {
-    lastUpdate: number;
-    id: string;
-    npcId: number;
-    name: string;
-    classId: number;
-    isBoss: boolean;
-    isPlayer: boolean;
-    isEsther?: boolean;
-    icon?: string;
-    isDead: boolean;
-    deaths: number;
-    deathTime: number;
-    gearScore: number;
-    currentHp: number;
-    maxHp: number;
-    damageInfo: DamageInfo;
-    healingDone: number;
-    shieldDone: number;
-    damageTaken: number;
-    skills: Map<number, EntitySkills>;
-    hits: Hits;
-    damageDealtDebuffedBy: Map<number, number>;
-    damageDealtBuffedBy: Map<number, number>;
-    shieldReceived: number;
-    damagePreventedWithShieldOnOthers: number;
-    damagePreventedByShield: number;
-    damagePreventedWithShieldOnOthersBy: Map<number, number>;
-    damagePreventedByShieldBy: Map<number, number>;
-    shieldDoneBy: Map<number, number>;
-    shieldReceivedBy: Map<number, number>;
-    statApiValid: boolean;
-}
-interface Breakdown {
-    timestamp: number;
-    damage: number;
-    targetEntity: string;
-    isCrit: boolean;
-    isBackAttack: boolean;
-    isFrontAttack: boolean;
-    isBuffedBySupport: boolean;
-    isDebuffedBySupport: boolean;
-    debuffedBy: number[];
-    buffedBy: number[];
-}
-interface EntitySkills {
-    id: number;
-    name: string;
-    icon: string | undefined;
-    damageInfo: DamageInfo;
-    maxDamage: number;
-    hits: Hits;
-    breakdown: Breakdown[];
-    damageDealtDebuffedBy: Map<number, number>;
-    damageDealtBuffedBy: Map<number, number>;
-}
-interface Hits {
-    casts: number;
-    total: number;
-    crit: number;
-    backAttack: number;
-    totalBackAttack: number;
-    frontAttack: number;
-    totalFrontAttack: number;
-    counter: number;
-    hitsDebuffedBySupport: number;
-    hitsBuffedBySupport: number;
-    hitsBuffedBy: Map<number, number>;
-    hitsDebuffedBy: Map<number, number>;
-}
-type GameTrackerOptions = {
-    isLive: boolean;
-    dontResetOnZoneChange: boolean;
-    resetAfterPhaseTransition: boolean;
-    splitOnPhaseTransition: boolean;
-};
-
 declare enum addontype {
     none = 0,
     slot = 1,
@@ -645,6 +487,185 @@ declare enum statuseffecttargettooltiptype {
     party = 2,
     self_party = 3
 }
+declare enum zonelevel {
+    normal = 0,
+    hard = 1,
+    hellchaos = 2,
+    challenge = 3,
+    special = 4,
+    extreme = 5
+}
+
+declare const PARSED_LOG_VERSION = 19;
+declare enum StatusEffectTarget {
+    OTHER = 0,
+    PARTY = 1,
+    SELF = 2
+}
+declare enum StatusEffectBuffTypeFlags {
+    NONE = 0,
+    DMG = 1,
+    CRIT = 2,
+    ATKSPEED = 4,
+    MOVESPEED = 8,
+    HP = 16,
+    DEFENSE = 32,
+    RESOURCE = 64,
+    COOLDOWN = 128,
+    STAGGER = 256,
+    SHIELD = 512,
+    ANY = 262144
+}
+interface StatusEffect {
+    target: StatusEffectTarget;
+    category: "buff" | "debuff";
+    buffcategory: string;
+    bufftype: StatusEffectBuffTypeFlags;
+    uniquegroup: number;
+    source: StatusEffectSource;
+}
+interface StatusEffectSource {
+    name: string;
+    desc: string;
+    icon: string;
+    skill?: Skill;
+    setname?: string;
+}
+interface DamageStatistics {
+    totalDamageDealt: number;
+    topDamageDealt: number;
+    totalDamageTaken: number;
+    topDamageTaken: number;
+    totalHealingDone: number;
+    topHealingDone: number;
+    totalShieldDone: number;
+    topShieldDone: number;
+    debuffs: Map<number, StatusEffect>;
+    buffs: Map<number, StatusEffect>;
+    topShieldGotten: number;
+    totalEffectiveShieldingDone: number;
+    topEffectiveShieldingDone: number;
+    topEffectiveShieldingUsed: number;
+    effectiveShieldingBuffs: Map<number, StatusEffect>;
+    appliedShieldingBuffs: Map<number, StatusEffect>;
+}
+interface GameState {
+    startedOn: number;
+    lastCombatPacket: number;
+    fightStartedOn: number;
+    localPlayer: string;
+    currentBoss: EntityState | undefined;
+    entities: Map<string, EntityState>;
+    damageStatistics: DamageStatistics;
+    killState: KillState;
+    zoneLevel: keyof typeof zonelevel;
+}
+interface GameStateNew {
+    startedOn: number;
+    lastCombatPacket: number;
+    fightStartedOn: number;
+    entities: Map<string, EntityState>;
+    damageStatistics: DamageStatistics;
+}
+interface HealSource {
+    source: string;
+    expires: number;
+}
+interface DamageInfo {
+    damageDealt: number;
+    rdpsDamageReceived: number;
+    rdpsDamageReceivedSupp: number;
+    rdpsDamageGiven: number;
+    damageDealtDebuffedBySupport: number;
+    damageDealtBuffedBySupport: number;
+}
+declare const enum RaidDifficulty {
+    UNKNOWN = 0,
+    NORMAL = 1,
+    HARD = 2,
+    HELL = 3,
+    TRIAL = 4
+}
+declare const enum KillState {
+    FAIL = 0,
+    CLEAR = 1
+}
+interface EntityState {
+    lastUpdate: number;
+    id: string;
+    npcId: number;
+    name: string;
+    classId: number;
+    isBoss: boolean;
+    isPlayer: boolean;
+    isEsther?: boolean;
+    icon?: string;
+    isDead: boolean;
+    deaths: number;
+    deathTime: number;
+    gearScore: number;
+    currentHp: number;
+    maxHp: number;
+    damageInfo: DamageInfo;
+    healingDone: number;
+    shieldDone: number;
+    damageTaken: number;
+    skills: Map<number, EntitySkills>;
+    hits: Hits;
+    damageDealtDebuffedBy: Map<number, number>;
+    damageDealtBuffedBy: Map<number, number>;
+    shieldReceived: number;
+    damagePreventedWithShieldOnOthers: number;
+    damagePreventedByShield: number;
+    damagePreventedWithShieldOnOthersBy: Map<number, number>;
+    damagePreventedByShieldBy: Map<number, number>;
+    shieldDoneBy: Map<number, number>;
+    shieldReceivedBy: Map<number, number>;
+    statApiValid: boolean;
+}
+interface Breakdown {
+    timestamp: number;
+    damage: number;
+    targetEntity: string;
+    isCrit: boolean;
+    isBackAttack: boolean;
+    isFrontAttack: boolean;
+    isBuffedBySupport: boolean;
+    isDebuffedBySupport: boolean;
+    debuffedBy: number[];
+    buffedBy: number[];
+}
+interface EntitySkills {
+    id: number;
+    name: string;
+    icon: string | undefined;
+    damageInfo: DamageInfo;
+    maxDamage: number;
+    hits: Hits;
+    breakdown: Breakdown[];
+    damageDealtDebuffedBy: Map<number, number>;
+    damageDealtBuffedBy: Map<number, number>;
+}
+interface Hits {
+    casts: number;
+    total: number;
+    crit: number;
+    backAttack: number;
+    totalBackAttack: number;
+    frontAttack: number;
+    totalFrontAttack: number;
+    counter: number;
+    hitsDebuffedBySupport: number;
+    hitsBuffedBySupport: number;
+    hitsBuffedBy: Map<number, number>;
+    hitsDebuffedBy: Map<number, number>;
+}
+type GameTrackerOptions = {
+    isLive: boolean;
+    dontResetOnZoneChange: boolean;
+    resetAfterPhaseTransition: boolean;
+    splitOnPhaseTransition: boolean;
+};
 
 declare const enum EntityType {
     Unknown = 0,
@@ -868,4 +889,4 @@ declare class MeterData {
     loadDbs(basePath: string): void;
 }
 
-export { Breakdown as B, CombatEffect as C, DamageStatistics as D, EntityState as E, GameTrackerOptions as G, HealSource as H, ItemSetData as I, MeterData as M, Npc as N, PARSED_LOG_VERSION as P, StatusEffectTarget as S, GameState as a, StatusEffectBuffTypeFlags as b, StatusEffect as c, StatusEffectSource as d, GameStateNew as e, DamageInfo as f, EntitySkills as g, Hits as h, Skill as i, SkillBuff as j, SkillFeature as k, SkillFeatureLevelData as l, SkillFeatureOption as m, PassiveOption as n, CombatEffectDetail as o, CombatEffectCondition as p, CombatEffectAction as q, SkillEffect as r, Esther as s, ItemSet as t, ItemSetLevel as u, ItemSetCount as v, CombatEffectConditionData as w, StatQueryFilter as x };
+export { Breakdown as B, CombatEffect as C, DamageStatistics as D, EntityState as E, GameTrackerOptions as G, HealSource as H, ItemSetData as I, KillState as K, MeterData as M, Npc as N, PARSED_LOG_VERSION as P, RaidDifficulty as R, StatusEffectTarget as S, GameState as a, StatusEffectBuffTypeFlags as b, StatusEffect as c, StatusEffectSource as d, GameStateNew as e, DamageInfo as f, EntitySkills as g, Hits as h, Skill as i, SkillBuff as j, SkillFeature as k, SkillFeatureLevelData as l, SkillFeatureOption as m, PassiveOption as n, CombatEffectDetail as o, CombatEffectCondition as p, CombatEffectAction as q, SkillEffect as r, Esther as s, ItemSet as t, ItemSetLevel as u, ItemSetCount as v, CombatEffectConditionData as w, StatQueryFilter as x };
